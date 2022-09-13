@@ -235,7 +235,7 @@ class RecursiveLGBMGlobalForecaster:
         if self.lgbm_kwargs is None:
             self.model = LGBMRegressor()
         else:
-            self.model = LGBMRegressor(, **self.lgbm_kwargs)
+            self.model = LGBMRegressor(**self.lgbm_kwargs)
         # feature engineering
         train_df = self._create_lagged_features(train_df)
         train_df = self._create_calendar_features(train_df, **self.calendar_features)
