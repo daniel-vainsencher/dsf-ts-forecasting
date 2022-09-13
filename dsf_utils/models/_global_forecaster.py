@@ -125,7 +125,7 @@ class DirectLGBMGlobalForecaster:
                 pd.DataFrame(
                     {
                         self.ts_id_col: self._pred_df.index.get_level_values(1),
-                        "y_pred": y_pred,
+                        self.target_col: y_pred,
                         "_date": step_date,
                     }
                 ),
@@ -274,7 +274,7 @@ class RecursiveLGBMGlobalForecaster:
                 pd.DataFrame(
                     {
                         self.ts_id_col: self._pred_df.index.get_level_values(1),
-                        "y_pred": y_pred,
+                        self.target_col: y_pred,
                         "_date": step_date,
                     }
                 ),
