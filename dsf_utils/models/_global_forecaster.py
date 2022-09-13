@@ -80,12 +80,12 @@ class DirectLGBMGlobalForecaster:
         # cat_feature_name = f"name:{self.ts_id_col}_encoded"
         if self.lgbm_kwargs is not None:
             self.models = [
-                LGBMRegressor(categorical_feature=-1, **self.lgbm_kwargs)
+                LGBMRegressor(**self.lgbm_kwargs)
                 for _ in range(len(fh))
             ]
         else:
             self.models = [
-                LGBMRegressor(categorical_feature=-1) for _ in range(len(fh))
+                LGBMRegressor() for _ in range(len(fh))
             ]
         # feature engineering
         train_df = self._create_lagged_features(train_df)
