@@ -137,7 +137,7 @@ def evaluate_panel_forecaster_on_cutoffs(
             _pred = pred_df[pred_df[ts_id_col] == ts]["y_pred"]
             _test = test_df[test_df[ts_id_col] == ts][target]
             _train = train_df[train_df[ts_id_col] == ts][target].sort_index()
-            if not (len(_pred) and len(_test) and len(_train)):
+            if not (len(_pred) and len(_test) and len(_train) > 1):
                 continue
             score = metric(y_true=_test, y_pred=_pred, y_train=_train)
             results = results.append(
