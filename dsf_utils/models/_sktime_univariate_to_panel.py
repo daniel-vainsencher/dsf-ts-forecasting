@@ -40,7 +40,7 @@ class SktimePanelForecaster:
     def predict(self, fh, X=None):
         pred_df = pd.DataFrame()
         for ts_name, forecaster in self.models_dict.items():
-            y_pred = forecaster.predict(fh, X=X).to_frame(name="y_pred")
+            y_pred = forecaster.predict(fh, X=X).to_frame(name=self.target_col)
             y_pred[self.ts_id_col] = ts_name
             pred_df = pred_df.append(y_pred, ignore_index=False)
 
