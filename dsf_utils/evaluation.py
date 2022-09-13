@@ -140,10 +140,15 @@ def evaluate_panel_forecaster_on_cutoffs(
             # predictions
             _pred = pred_df[pred_df[ts_id_col] == ts][target]
             # restrict evaluation to where ground truth exists.
+            if not (len(_pred) and len(_test) and len(_train) > 1):
+                # if _pred or _test are empty, no metric is valid
+                # requiring _train >= 2 is a hack here, 
+                # as it is actually necessary only for specific metrics, e.g., RMSSE.
+                # The ignored metrics (on trivial training sets only) are ok to lose 
+                # for now, as focus is not on cold-start problem
+                continue
             _pred = _pred.loc[_test.index]
             _train = train_df[train_df[ts_id_col] == ts][target].sort_index()
-            if not (len(_pred) and len(_test) and len(_train) > 1):
-                continue
             score = metric(y_true=_test, y_pred=_pred, y_train=_train)
             results = results.append(
                 {
