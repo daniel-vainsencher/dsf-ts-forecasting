@@ -135,7 +135,7 @@ def evaluate_panel_forecaster_on_cutoffs(
 
         # loop over regions to get region level metrics and y_preds
         for ts in ts_list:
-            _pred = pred_df[pred_df[ts_id_col] == ts]["y_pred"]
+            _pred = pred_df[pred_df[ts_id_col] == ts][target]
             _test = test_df[test_df[ts_id_col] == ts][target]
             _train = train_df[train_df[ts_id_col] == ts][target].sort_index()
             if not (len(_pred) and len(_test) and len(_train) > 1):
