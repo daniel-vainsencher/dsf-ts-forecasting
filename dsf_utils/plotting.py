@@ -65,6 +65,6 @@ def plot_interactive_panel_series(panel_df, pred_df, start_date="2018-01-01"):
         plot_region_from_panel,
         panel_df=widgets.fixed(panel_df),
         pred_df=widgets.fixed(pred_df),
-        region=widgets.Dropdown(options=regions, value=regions.get(0,None),
+        region=widgets.Dropdown(options=regions, value=regions.get(0,None)),
         start_date=widgets.fixed(start_date),
     )
