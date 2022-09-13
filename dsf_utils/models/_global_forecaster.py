@@ -92,7 +92,7 @@ class DirectLGBMGlobalForecaster:
         train_df = self._create_calendar_features(train_df, **self.calendar_features)
         train_df, targets = self._multistep_targets(train_df, fh=fh)
         train_df = self._categorical_features_processing(train_df)
-        train_df = train_df.set_index("REGION", drop=True, append=True)
+        train_df = train_df.set_index(self.ts_id_col, drop=True, append=True)
 
         # fit the models
         for h_step in range(len(fh)):
@@ -241,7 +241,7 @@ class RecursiveLGBMGlobalForecaster:
         train_df = self._create_calendar_features(train_df, **self.calendar_features)
         train_df, target = self._training_target(train_df)
         train_df = self._categorical_features_processing(train_df)
-        train_df = train_df.set_index("REGION", drop=True, append=True)
+        train_df = train_df.set_index(self.ts_id_col, drop=True, append=True)
 
         _train_df = train_df.copy()
         # drop rows where the target is null
