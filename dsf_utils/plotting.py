@@ -43,7 +43,7 @@ def plot_interactive_panel_cv_results(panel_df, eval_df, ts_id_col, start_date="
         plot_panel_cv_results,
         panel_df=widgets.fixed(panel_df),
         eval_df=widgets.fixed(eval_df),
-        region=widgets.Dropdown(options=regions, value=regions.get(0,None)),
+        region=widgets.Dropdown(options=regions, value=regions[0] if len(regions) else None),
         start_date=widgets.fixed(start_date),
     )
 
@@ -58,13 +58,12 @@ def plot_region_from_panel(panel_df, pred_df, region, freq, start_date="2018-01-
     plt.title(f"{region}")
     plt.show()
 
-
 def plot_interactive_panel_series(panel_df, pred_df, start_date="2018-01-01"):
     regions = list(panel_df[ts_id_col].unique())
     _ = widgets.interact(
         plot_region_from_panel,
         panel_df=widgets.fixed(panel_df),
         pred_df=widgets.fixed(pred_df),
-        region=widgets.Dropdown(options=regions, value=regions.get(0,None)),
+        region=widgets.Dropdown(options=regions, value=regions[0] if len(regions) else None),
         start_date=widgets.fixed(start_date),
     )
