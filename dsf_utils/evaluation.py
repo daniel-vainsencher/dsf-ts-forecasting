@@ -98,8 +98,8 @@ def evaluate_panel_forecaster_on_cutoffs(
     forecaster,
     metric,
     fh: np.array, # = np.arange(3) + 1,
-    window_length: int,# = 5 * 52,
-    freq=, # "W-SUN",
+    window_length: int, # = 5 * 52,
+    freq, # ="W-SUN",
     ts_id_col, # ="REGION",
     target, # ="ILITOTAL",
 ) -> pd.DataFrame:
