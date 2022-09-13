@@ -20,12 +20,12 @@ def plot_cv_results(time_series: pd.Series, df: pd.DataFrame):
         plt.show()
 
 
-def plot_panel_cv_results(panel_df, eval_df, region, start_date="2018-01-01"):
-    start_date = pd.Period(start_date, freq="W-SUN")
-    ts = panel_df[(panel_df["REGION"] == region) & (panel_df.index >= start_date)][
+def plot_panel_cv_results(panel_df, eval_df, ts_col_id, region, freq, start_date="2018-01-01"):
+    start_date = pd.Period(start_date, freq=freq)
+    ts = panel_df[(panel_df[ts_id_col] == region) & (panel_df.index >= start_date)][
         "ILITOTAL"
     ]
-    _eval_df = eval_df[eval_df["REGION"] == region]
+    _eval_df = eval_df[eval_df[ts_id_col] == region]
     plot_list = [_eval_df["y_pred"].iloc[i].sort_index() for i in range(len(_eval_df))]
     plot_series(
         ts,
@@ -37,20 +37,20 @@ def plot_panel_cv_results(panel_df, eval_df, region, start_date="2018-01-01"):
     plt.show()
 
 
-def plot_interactive_panel_cv_results(panel_df, eval_df, start_date="2018-01-01"):
-    regions = list(panel_df["REGION"].unique())
+def plot_interactive_panel_cv_results(panel_df, eval_df, ts_id_col, start_date="2018-01-01"):
+    regions = list(panel_df[ts_id_col].unique())
     _ = widgets.interact(
         plot_panel_cv_results,
         panel_df=widgets.fixed(panel_df),
         eval_df=widgets.fixed(eval_df),
-        region=widgets.Dropdown(options=regions, value="California"),
+        region=widgets.Dropdown(options=regions, value=regions.get(0,None)),
         start_date=widgets.fixed(start_date),
     )
 
 
-def plot_region_from_panel(panel_df, pred_df, region, start_date="2018-01-01"):
+def plot_region_from_panel(panel_df, pred_df, region, freq, start_date="2018-01-01"):
     _panel_df = panel_df.copy()
-    start_date = pd.Period(start_date, freq="W-SUN")
+    start_date = pd.Period(start_date, freq=freq)
     _panel_df = _panel_df[panel_df.index >= start_date]
     actuals = single_region_ts(_panel_df, region)
     pred = single_region_ts(pred_df, region, y_name="y_pred")
@@ -60,11 +60,11 @@ def plot_region_from_panel(panel_df, pred_df, region, start_date="2018-01-01"):
 
 
 def plot_interactive_panel_series(panel_df, pred_df, start_date="2018-01-01"):
-    regions = list(panel_df["REGION"].unique())
+    regions = list(panel_df[ts_id_col].unique())
     _ = widgets.interact(
         plot_region_from_panel,
         panel_df=widgets.fixed(panel_df),
         pred_df=widgets.fixed(pred_df),
-        region=widgets.Dropdown(options=regions, value="California"),
+        region=widgets.Dropdown(options=regions, value=regions.get(0,None),
         start_date=widgets.fixed(start_date),
     )
