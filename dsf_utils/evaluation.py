@@ -102,6 +102,7 @@ def evaluate_panel_forecaster_on_cutoffs(
     freq, # ="W-SUN",
     ts_id_col, # ="REGION",
     target, # ="ILITOTAL",
+    known_feature_cols=[],
 ) -> pd.DataFrame:
     """ 
     ts_id_col is the column in panel_df that distinguishes the panels.
@@ -126,11 +127,11 @@ def evaluate_panel_forecaster_on_cutoffs(
         ]
         # if forecaster doesn't need fh in fit fh will be ignored.
         # forecaster.fit is not being passed any X, so no support for exogenous variables.
-        _forecaster.fit(train_df, fh=fh)
+        _forecaster.fit(train_df, X=train_df[known_feature_cols], fh=fh)
         # no exog. 
         # Also, does not take into account panels starting at/after cutoff (=> having no training data => not creating predictions). 
         
-        pred_df = _forecaster.predict(fh=fh)
+        pred_df = _forecaster.predict(fh=fh, X=test_df[known_feature_cols],)
 
         # loop over regions to get region level metrics and y_preds
         for ts in ts_list:
