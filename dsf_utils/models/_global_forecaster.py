@@ -73,7 +73,7 @@ class DirectLGBMGlobalForecaster:
         )
         return _train_df
 
-    def fit(self, ts_df: pd.DataFrame, fh):
+    def fit(self, ts_df: pd.DataFrame, fh, X=None):
         train_df = ts_df.copy()
         # create a model per timestep
         self.is_fitted = False
@@ -113,7 +113,7 @@ class DirectLGBMGlobalForecaster:
 
         self.is_fitted = True
 
-    def predict(self, fh):
+    def predict(self, fh, X=None):
         pred_df = pd.DataFrame()
         for h_step in range(len(fh)):
             step_date = self._train_max_date + fh[h_step]
