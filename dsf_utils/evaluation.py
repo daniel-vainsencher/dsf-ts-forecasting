@@ -145,7 +145,7 @@ def evaluate_panel_forecaster_on_cutoffs(
                 continue
             _pred = _pred.loc[_test.index]
             _train = train_df[train_df[ts_id_col] == ts][target].sort_index()
-            if len(_train) < 2):
+            if len(_train) < 2:
                 # requiring _train >= 2 is a hack here, 
                 # as it is actually necessary only for specific metrics, e.g., RMSSE.
                 # The ignored metrics (on trivial training sets only) are ok to lose 
