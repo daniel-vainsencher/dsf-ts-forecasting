@@ -37,8 +37,8 @@ def plot_panel_cv_results(panel_df, eval_df, ts_col_id, region, freq, start_date
     plt.show()
 
 
-def plot_interactive_panel_cv_results(panel_df, eval_df, time_series_id=ts_id_col, start_date="2018-01-01"):
-    regions = list(panel_df[ts_id_col].unique())
+def plot_interactive_panel_cv_results(panel_df, eval_df, time_series_id=None, start_date="2018-01-01"):
+    regions = list(panel_df[time_series_id].unique())
     _ = widgets.interact(
         plot_panel_cv_results,
         panel_df=widgets.fixed(panel_df),
