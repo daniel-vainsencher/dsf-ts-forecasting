@@ -92,18 +92,23 @@ def display_results(df, axis=0):
 
     display(results)
 
-
 def evaluate_panel_forecaster_on_cutoffs(
     panel_df: pd.DataFrame,
     cutoffs: list,
     forecaster,
     metric,
-    fh: np.array = np.arange(3) + 1,
-    window_length: int = 5 * 52,
-    freq="W-SUN",
-    ts_id_col="REGION",
-    target="ILITOTAL",
+    fh: np.array, # = np.arange(3) + 1,
+    window_length: int, # = 5 * 52,
+    freq, # ="W-SUN",
+    ts_id_col, # ="REGION",
+    target, # ="ILITOTAL",
+    known_feature_cols=[],
 ) -> pd.DataFrame:
+    """ 
+    ts_id_col is the column in panel_df that distinguishes the panels.
+    target is the column to predict
+    
+    """
     _panel_df = panel_df.copy()
     _panel_df = _panel_df.sort_values(by=[ts_id_col]).sort_index()
     ts_list = list(panel_df[ts_id_col].unique())
@@ -121,14 +126,31 @@ def evaluate_panel_forecaster_on_cutoffs(
             (_panel_df.index >= min_test_date) & (_panel_df.index <= max_test_date)
         ]
         # if forecaster doesn't need fh in fit fh will be ignored.
-        _forecaster.fit(train_df, fh=fh)
-        pred_df = _forecaster.predict(fh=fh)
+        # forecaster.fit is not being passed any X, so no support for exogenous variables.
+        _forecaster.fit(train_df, X=train_df[known_feature_cols], fh=fh)
+        # no exog. 
+        # Also, does not take into account panels starting at/after cutoff (=> having no training data => not creating predictions). 
+        
+        pred_df = _forecaster.predict(fh=fh, X=test_df[known_feature_cols],)
 
         # loop over regions to get region level metrics and y_preds
         for ts in ts_list:
-            _pred = pred_df[pred_df[ts_id_col] == ts]["y_pred"]
+            # ground truth
             _test = test_df[test_df[ts_id_col] == ts][target]
+            # predictions
+            _pred = pred_df[pred_df[ts_id_col] == ts][target]
+            # restrict evaluation to where ground truth exists.
+            if not (len(_pred) and len(_test)):
+                # if _pred or _test are empty, no metric is valid
+                continue
+            _pred = _pred.loc[_test.index]
             _train = train_df[train_df[ts_id_col] == ts][target].sort_index()
+            if len(_train) < 2:
+                # requiring _train >= 2 is a hack here, 
+                # as it is actually necessary only for specific metrics, e.g., RMSSE.
+                # The ignored metrics (on trivial training sets only) are ok to lose 
+                # for now, as focus is not on cold-start problem
+                continue
             score = metric(y_true=_test, y_pred=_pred, y_train=_train)
             results = results.append(
                 {

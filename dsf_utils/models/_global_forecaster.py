@@ -73,26 +73,26 @@ class DirectLGBMGlobalForecaster:
         )
         return _train_df
 
-    def fit(self, ts_df: pd.DataFrame, fh):
+    def fit(self, ts_df: pd.DataFrame, fh, X=None):
         train_df = ts_df.copy()
         # create a model per timestep
         self.is_fitted = False
         # cat_feature_name = f"name:{self.ts_id_col}_encoded"
         if self.lgbm_kwargs is not None:
             self.models = [
-                LGBMRegressor(categorical_feature=-1, **self.lgbm_kwargs)
+                LGBMRegressor(**self.lgbm_kwargs)
                 for _ in range(len(fh))
             ]
         else:
             self.models = [
-                LGBMRegressor(categorical_feature=-1) for _ in range(len(fh))
+                LGBMRegressor() for _ in range(len(fh))
             ]
         # feature engineering
         train_df = self._create_lagged_features(train_df)
         train_df = self._create_calendar_features(train_df, **self.calendar_features)
         train_df, targets = self._multistep_targets(train_df, fh=fh)
         train_df = self._categorical_features_processing(train_df)
-        train_df = train_df.set_index("REGION", drop=True, append=True)
+        train_df = train_df.set_index(self.ts_id_col, drop=True, append=True)
 
         # fit the models
         for h_step in range(len(fh)):
@@ -113,7 +113,7 @@ class DirectLGBMGlobalForecaster:
 
         self.is_fitted = True
 
-    def predict(self, fh):
+    def predict(self, fh, X=None):
         pred_df = pd.DataFrame()
         for h_step in range(len(fh)):
             step_date = self._train_max_date + fh[h_step]
@@ -125,7 +125,7 @@ class DirectLGBMGlobalForecaster:
                 pd.DataFrame(
                     {
                         self.ts_id_col: self._pred_df.index.get_level_values(1),
-                        "y_pred": y_pred,
+                        self.target_col: y_pred,
                         "_date": step_date,
                     }
                 ),
@@ -233,15 +233,15 @@ class RecursiveLGBMGlobalForecaster:
         # create a model per timestep
         self.is_fitted = False
         if self.lgbm_kwargs is None:
-            self.model = LGBMRegressor(categorical_feature=-1)
+            self.model = LGBMRegressor()
         else:
-            self.model = LGBMRegressor(categorical_feature=-1, **self.lgbm_kwargs)
+            self.model = LGBMRegressor(**self.lgbm_kwargs)
         # feature engineering
         train_df = self._create_lagged_features(train_df)
         train_df = self._create_calendar_features(train_df, **self.calendar_features)
         train_df, target = self._training_target(train_df)
         train_df = self._categorical_features_processing(train_df)
-        train_df = train_df.set_index("REGION", drop=True, append=True)
+        train_df = train_df.set_index(self.ts_id_col, drop=True, append=True)
 
         _train_df = train_df.copy()
         # drop rows where the target is null
@@ -274,7 +274,7 @@ class RecursiveLGBMGlobalForecaster:
                 pd.DataFrame(
                     {
                         self.ts_id_col: self._pred_df.index.get_level_values(1),
-                        "y_pred": y_pred,
+                        self.target_col: y_pred,
                         "_date": step_date,
                     }
                 ),
